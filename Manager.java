@@ -2,16 +2,15 @@ import java.util.ArrayList;
 import java.util.concurrent.Semaphore;
 
 public class Manager {
-
-    public Semaphore access;
-    public Semaphore full;
-    public Semaphore empty;
+    public Semaphore access = new Semaphore(1);
+    public Semaphore emptySlots;
+    public Semaphore fullSlots;
+    public Semaphore done = new Semaphore(0);
 
     public ArrayList<String> storage = new ArrayList<>();
 
     public Manager(int storageSize) {
-        access = new Semaphore(1);
-        full = new Semaphore(storageSize);
-        empty = new Semaphore(0);
+        this.emptySlots = new Semaphore(storageSize);
+        this.fullSlots = new Semaphore(0);
     }
 }
