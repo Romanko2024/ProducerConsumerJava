@@ -7,6 +7,7 @@ public class Producer implements Runnable {
         this.itemsToProduce = itemsToProduce;
         this.manager = manager;
         this.id = id;
+        System.out.println("Виробник " + id + " створений. Квота: " + itemsToProduce);
     }
 
     @Override
@@ -23,7 +24,7 @@ public class Producer implements Runnable {
                 manager.access.release();
                 manager.fullSlots.release();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         manager.done.release();

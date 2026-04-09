@@ -1,8 +1,10 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Scanner scanner = new Scanner(System.in);
+        Random random = new Random();
 
         System.out.print("Введіть місткість сховища: ");
         int storageSize = scanner.nextInt();
@@ -15,22 +17,15 @@ public class Main {
 
         Manager manager = new Manager(storageSize);
 
-        int itemsPerProducer = totalItems / producersCount;
-        int prodRemainder = totalItems % producersCount;
+        int[] prodQuotas = distributeQuota(totalItems, producersCount, random);
+        int[] consQuotas = distributeQuota(totalItems, consumersCount, random);
 
-        int itemsPerConsumer = totalItems / consumersCount;
-        int consRemainder = totalItems % consumersCount;
-
-        //запуск producers
         for (int i = 0; i < producersCount; i++) {
-            int work = itemsPerProducer + (i == 0 ? prodRemainder : 0);
-            new Thread(new Producer(work, manager, i)).start();
+            new Thread(new Producer(prodQuotas[i], manager, i)).start();
         }
 
-        // запуск consumers
         for (int i = 0; i < consumersCount; i++) {
-            int work = itemsPerConsumer + (i == 0 ? consRemainder : 0);
-            new Thread(new Consumer(work, manager, i)).start();
+            new Thread(new Consumer(consQuotas[i], manager, i)).start();
         }
 
         int totalThreads = producersCount + consumersCount;
@@ -39,5 +34,22 @@ public class Main {
         }
 
         System.out.println("Усі потоки завершили роботу.");
+    }
+
+    private static int[] distributeQuota(int total, int count, Random random) {
+        int[] quotas = new int[count];
+        int remaining = total;
+
+        for (int i = 0; i < count - 1; i++) {
+            int maxForThisThread = remaining - (count - i - 1);
+            if (maxForThisThread <= 1) {
+                quotas[i] = 1;
+            } else {
+                quotas[i] = random.nextInt(maxForThisThread) + 1;
+            }
+            remaining -= quotas[i];
+        }
+        quotas[count - 1] = remaining;
+        return quotas;
     }
 }

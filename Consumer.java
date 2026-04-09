@@ -7,6 +7,7 @@ public class Consumer implements Runnable {
         this.itemsToConsume = itemsToConsume;
         this.manager = manager;
         this.id = id;
+        System.out.println("Споживач " + id + " створений. Квота: " + itemsToConsume);
     }
 
     @Override
@@ -22,7 +23,7 @@ public class Consumer implements Runnable {
                 manager.access.release();
                 manager.emptySlots.release();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         manager.done.release();
